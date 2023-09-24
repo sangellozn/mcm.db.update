@@ -32,4 +32,58 @@ public class SetsDb {
 	private Integer totalSetSize;
 	private String type;
 	
+	public Object[] forInsert() {
+		return new Object[] {
+				this.baseSetSize,
+				this.block,
+				this.cardsphereSetId,
+				this.code,
+				this.isFoilOnly,
+				this.isForeignOnly,
+				this.isNonFoilOnly,
+				this.isOnlineOnly,
+				this.isPartialPreview,
+				this.keyruneCode,
+				this.languages,
+				this.mcmId,
+				this.mcmIdExtras,
+				this.mcmName,
+				this.mtgoCode,
+				this.name,
+				this.parentCode,
+				this.releaseDate,
+				this.tcgplayerGroupId,
+				this.tokenSetCode,
+				this.totalSetSize,
+				this.type
+		};
+	}
+	
+	public Object[] forUpdate() {
+		return new Object[] {
+				this.baseSetSize,
+				this.block,
+				this.cardsphereSetId,
+				this.isFoilOnly,
+				this.isForeignOnly,
+				this.isNonFoilOnly,
+				this.isOnlineOnly,
+				this.isPartialPreview,
+				this.keyruneCode,
+				this.languages,
+				this.mcmId,
+				this.mcmIdExtras,
+				this.mcmName,
+				this.mtgoCode,
+				this.name,
+				this.parentCode,
+				this.releaseDate,
+				this.tcgplayerGroupId,
+				this.tokenSetCode,
+				this.totalSetSize,
+				this.type,
+				this.code
+		};
+	}
+	
 }
