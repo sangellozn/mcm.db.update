@@ -1,8 +1,8 @@
-package inf.san.mcm.db.update.model;
+package inf.san.mcm.db.update.model.queries;
 
-public final class DbUpdateQueries {
+public final class DbUpdateSetsQueries {
 	
-	public static final String EXISTS_BY_CODE_SETS = """
+	public static final String EXISTS_BY_CODE = """
 			select 
 			    case 
 			        when exists (
@@ -13,7 +13,7 @@ public final class DbUpdateQueries {
 			as exist
 			""";
 
-	public static final String SELECT_SETS = """
+	public static final String SELECT = """
 			SELECT baseSetSize, 
 				block, 
 				cardsphereSetId, 
@@ -39,7 +39,7 @@ public final class DbUpdateQueries {
 			FROM "sets"
 			""";
 	
-	public static final String INSERT_SETS = """
+	public static final String INSERT = """
 			INSERT INTO "sets" (baseSetSize, 
 				block, 
 				cardsphereSetId, 
@@ -65,7 +65,7 @@ public final class DbUpdateQueries {
 			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			""";
 	
-	public static final String UPDATE_SETS = """
+	public static final String UPDATE = """
 			UPDATE "sets"
 			SET baseSetSize = ?, 
 				block = ?, 
@@ -91,7 +91,7 @@ public final class DbUpdateQueries {
 				WHERE code = ?
 			""";
 	
-	private DbUpdateQueries() {
+	private DbUpdateSetsQueries() {
 		// Nothing.
 	}
 	

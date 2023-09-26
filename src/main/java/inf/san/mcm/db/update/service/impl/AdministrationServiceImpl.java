@@ -1,15 +1,26 @@
 package inf.san.mcm.db.update.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import inf.san.mcm.db.update.mapper.row.SetsDbRowMapper;
-import inf.san.mcm.db.update.model.DbUpdateQueries;
+import inf.san.mcm.db.update.mapper.row.TokenDbRowMapper;
 import inf.san.mcm.db.update.model.SetsDb;
+import inf.san.mcm.db.update.model.TokensDb;
+import inf.san.mcm.db.update.model.queries.DbUpdateSetsQueries;
+import inf.san.mcm.db.update.model.queries.DbUpdateTokenQueries;
 import inf.san.mcm.db.update.service.IAdministrationService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,24 +32,29 @@ public class AdministrationServiceImpl implements IAdministrationService {
 	
 	private final JdbcTemplate liveJdbcTemplate;
 	
+	private final String masterDownloadUrl;
+	
+	private final String masterFullPath;
+	
 	public AdministrationServiceImpl(@Qualifier("masterJdbcTemplate") JdbcTemplate masterJdbcTemplate, 
-			@Qualifier("liveJdbcTemplate") JdbcTemplate liveJdbcTemplate) {
+			@Qualifier("liveJdbcTemplate") JdbcTemplate liveJdbcTemplate, @Value("${db.update.master.dl.url}") String masterDownloadUrl, 
+			@Value("${db.update.master.fullpath}") String masterFullPath) {
 		this.masterJdbcTemplate = masterJdbcTemplate;
 		this.liveJdbcTemplate = liveJdbcTemplate;
+		this.masterDownloadUrl = masterDownloadUrl;
+		this.masterFullPath = masterFullPath;
 	}
 
 	@Override
 	@Transactional
 	public void updateDataBase() {
-		downloadNewMaster();
+		//downloadNewMaster(); FIXME décommenter une fois les tests terminés.
 		updateSets();
-		updateSetsTranslations();
 		updateSetsBoosterSheets();
 		updateSetsBoosterSheetCards();
 		updateSetsBoosterContentWeights();
 		updateSetsBoosterContents();
 		updateTokens();
-		updateTokenIdentifiers();
 		updateMeta();
 		updateCards();
 		updateCardRulings();
@@ -83,13 +99,29 @@ public class AdministrationServiceImpl implements IAdministrationService {
 		
 	}
 
-	private void updateTokenIdentifiers() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	private void updateTokens() {
-		// TODO Auto-generated method stub
+		try (Stream<TokensDb> tokensStream = masterJdbcTemplate.queryForStream(DbUpdateTokenQueries.SELECT, new TokenDbRowMapper())) {
+			tokensStream.forEach(tokenDb -> {
+				if (liveJdbcTemplate.queryForObject(DbUpdateTokenQueries.EXISTS_BY_UUID, Boolean.class, tokenDb.getUuid())) {
+					log.info("Mise à jour du token uuid = {}", tokenDb.getUuid());
+					liveJdbcTemplate.update(DbUpdateTokenQueries.UPDATE, tokenDb.forUpdate());
+				} else {
+					log.info("Création d'un nouveau token avec uuid = {}", tokenDb.getUuid());
+					liveJdbcTemplate.update(DbUpdateTokenQueries.INSERT, tokenDb.forInsert());
+				}
+			});
+		}
+		
+		// Suppression des tokens n'existant plus dans le master
+		for (String uuid : liveJdbcTemplate.queryForList(DbUpdateTokenQueries.SELECT_UUID, String.class)) {
+			if (!masterJdbcTemplate.queryForObject(DbUpdateTokenQueries.EXISTS_BY_UUID, Boolean.class, uuid)) {
+				log.info("Token avec uuid = {} n'existe plus dans la base master, suppression du token et des ses relations.", uuid);
+				liveJdbcTemplate.update(DbUpdateTokenQueries.DELETE, uuid);
+				liveJdbcTemplate.update(DbUpdateTokenQueries.DELETE_TOKEN_IDENTIFIERS, uuid);
+			}
+		}
+		
+		// FIXME Mise à jour des tokens identifiers ici
 		
 	}
 
@@ -113,24 +145,25 @@ public class AdministrationServiceImpl implements IAdministrationService {
 		
 	}
 
-	private void updateSetsTranslations() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	private void downloadNewMaster() {
-		// TODO
+		try (InputStream in = new URL(this.masterDownloadUrl).openStream()) {
+			Files.copy(in, Paths.get(masterFullPath), StandardCopyOption.REPLACE_EXISTING);
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(e);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	private void updateSets() {
-		try (Stream<SetsDb> setsStream = masterJdbcTemplate.queryForStream(DbUpdateQueries.SELECT_SETS, new SetsDbRowMapper())) {
+		try (Stream<SetsDb> setsStream = masterJdbcTemplate.queryForStream(DbUpdateSetsQueries.SELECT, new SetsDbRowMapper())) {
 			setsStream.forEach(setsDb -> {
-				if (liveJdbcTemplate.queryForObject(DbUpdateQueries.EXISTS_BY_CODE_SETS, Boolean.class, setsDb.getCode())) {
+				if (liveJdbcTemplate.queryForObject(DbUpdateSetsQueries.EXISTS_BY_CODE, Boolean.class, setsDb.getCode())) {
 					log.info("Mise à jour du sets code = {}", setsDb.getCode());
-					liveJdbcTemplate.update(DbUpdateQueries.UPDATE_SETS, setsDb.forUpdate());
+					liveJdbcTemplate.update(DbUpdateSetsQueries.UPDATE, setsDb.forUpdate());
 				} else {
 					log.info("Création d'un nouveau sets avec code = {}", setsDb.getCode());
-					liveJdbcTemplate.update(DbUpdateQueries.INSERT_SETS, setsDb.forInsert());
+					liveJdbcTemplate.update(DbUpdateSetsQueries.INSERT, setsDb.forInsert());
 				}
 			});
 		}

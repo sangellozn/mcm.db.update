@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class SetsDb {
+public class SetsDb implements IInsertableUpdatable {
 
 	private Integer baseSetSize;
 	private String block;
@@ -32,6 +32,7 @@ public class SetsDb {
 	private Integer totalSetSize;
 	private String type;
 	
+	@Override
 	public Object[] forInsert() {
 		return new Object[] {
 				this.baseSetSize,
@@ -59,6 +60,7 @@ public class SetsDb {
 		};
 	}
 	
+	@Override
 	public Object[] forUpdate() {
 		return new Object[] {
 				this.baseSetSize,
