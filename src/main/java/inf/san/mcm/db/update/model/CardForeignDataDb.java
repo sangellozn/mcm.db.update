@@ -9,18 +9,41 @@ import lombok.ToString;
 @ToString
 public class CardForeignDataDb implements IInsertableUpdatable {
 	
-	
+	private String faceName;
+	private String flavorText;
+	private String language;
+	private Integer multiverseId;
+	private String name;
+	private String text;
+	private String type;
+	private String uuid;
 	
 	@Override
 	public Object[] forUpdate() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Object[] {
+				this.faceName,
+				this.flavorText,
+				this.language,
+				this.multiverseId,
+				this.name,
+				this.text,
+				this.type,
+				this.uuid
+		};
 	}
 
 	@Override
 	public Object[] forInsert() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Object[] {
+				this.faceName,
+				this.flavorText,
+				this.language,
+				this.multiverseId,
+				this.name,
+				this.text,
+				this.type,
+				this.uuid
+		};
 	}
 
 }

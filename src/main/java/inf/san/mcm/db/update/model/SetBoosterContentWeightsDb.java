@@ -9,16 +9,29 @@ import lombok.ToString;
 @ToString
 public class SetBoosterContentWeightsDb implements IInsertableUpdatable {
 	
+	private Integer boosterIndex;
+	private String boosterName;
+	private Integer boosterWeight;
+	private String setCode;
+	
 	@Override
 	public Object[] forUpdate() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Object[] {
+				boosterIndex,
+				boosterName,
+				boosterWeight,
+				setCode
+		};
 	}
 
 	@Override
 	public Object[] forInsert() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Object[] {
+				boosterIndex,
+				boosterName,
+				boosterWeight,
+				setCode
+		};
 	}
 
 }

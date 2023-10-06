@@ -15,10 +15,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import inf.san.mcm.db.update.mapper.row.MetaDbRowMapper;
 import inf.san.mcm.db.update.mapper.row.SetsDbRowMapper;
 import inf.san.mcm.db.update.mapper.row.TokenDbRowMapper;
+import inf.san.mcm.db.update.mapper.row.TokenIdentifiersDbRowMapper;
+import inf.san.mcm.db.update.model.MetaDb;
 import inf.san.mcm.db.update.model.SetsDb;
+import inf.san.mcm.db.update.model.TokenIndentifiersDb;
 import inf.san.mcm.db.update.model.TokensDb;
+import inf.san.mcm.db.update.model.queries.DbMetaQueries;
 import inf.san.mcm.db.update.model.queries.DbUpdateSetsQueries;
 import inf.san.mcm.db.update.model.queries.DbUpdateTokenQueries;
 import inf.san.mcm.db.update.service.IAdministrationService;
@@ -48,20 +53,38 @@ public class AdministrationServiceImpl implements IAdministrationService {
 	@Override
 	@Transactional
 	public void updateDataBase() {
+		log.info("Début de la mise à jour de la base de données...");
+		
+		log.info("Téléchargement de la base master...");
 		//downloadNewMaster(); FIXME décommenter une fois les tests terminés.
+		log.info("Base master téléchargée !");
+		
+		log.info("Mise à jour des sets...");
 		updateSets();
 		updateSetsBoosterSheets();
 		updateSetsBoosterSheetCards();
 		updateSetsBoosterContentWeights();
 		updateSetsBoosterContents();
+		log.info("Sets mis à jour !");
+		
+		log.info("Mise à jour des tokens...");
 		updateTokens();
+		log.info("Tokens mis à jour !");
+		
+		log.info("Mise à jour des méta data...");
 		updateMeta();
+		log.info("Méta data mises à jour !");
+		
+		log.info("Mise à jour des cartes...");
 		updateCards();
 		updateCardRulings();
 		updateCardPurchaseUrls();
 		updateCardLegalities();
 		updateCardIdentifiers();
 		updateCardForeignData();
+		log.info("Cartes mises à jour !");
+		
+		log.info("Mise à jour terminée !");
 	}
 	
 	private void updateCardForeignData() {
@@ -95,7 +118,13 @@ public class AdministrationServiceImpl implements IAdministrationService {
 	}
 
 	private void updateMeta() {
-		// TODO Auto-generated method stub
+		liveJdbcTemplate.execute(DbMetaQueries.DELETE_ALL);
+		
+		try (Stream<MetaDb> metaStream = masterJdbcTemplate.queryForStream(DbMetaQueries.SELECT, new MetaDbRowMapper())) {
+			metaStream.forEach(metaDb -> {
+				liveJdbcTemplate.update(DbMetaQueries.INSERT, metaDb.forInsert());
+			});
+		}
 		
 	}
 
@@ -112,6 +141,18 @@ public class AdministrationServiceImpl implements IAdministrationService {
 			});
 		}
 		
+		try (Stream<TokenIndentifiersDb> tokenIdentifiersStream = masterJdbcTemplate.queryForStream(DbUpdateTokenQueries.SELECT_TOKEN_IDENTIFIERS, new TokenIdentifiersDbRowMapper())) {
+			tokenIdentifiersStream.forEach(tokenIdentifiersDb -> {
+				if (liveJdbcTemplate.queryForObject(DbUpdateTokenQueries.EXISTS_TOKEN_BY_UUID, Boolean.class, tokenIdentifiersDb.getUuid())) {
+					log.info("Mise à jour du token identifiers uuid = {}", tokenIdentifiersDb.getUuid());
+					liveJdbcTemplate.update(DbUpdateTokenQueries.UPDATE_TOKEN_IDENTIFIERS, tokenIdentifiersDb.forUpdate());
+				} else {
+					log.info("Création d'un nouveau token identifiers avec uuid = {}", tokenIdentifiersDb.getUuid());
+					liveJdbcTemplate.update(DbUpdateTokenQueries.INSERT_TOKEN_IDENTIFIERS, tokenIdentifiersDb.forInsert());
+				}
+			});
+		}
+		
 		// Suppression des tokens n'existant plus dans le master
 		for (String uuid : liveJdbcTemplate.queryForList(DbUpdateTokenQueries.SELECT_UUID, String.class)) {
 			if (!masterJdbcTemplate.queryForObject(DbUpdateTokenQueries.EXISTS_BY_UUID, Boolean.class, uuid)) {
@@ -120,8 +161,6 @@ public class AdministrationServiceImpl implements IAdministrationService {
 				liveJdbcTemplate.update(DbUpdateTokenQueries.DELETE_TOKEN_IDENTIFIERS, uuid);
 			}
 		}
-		
-		// FIXME Mise à jour des tokens identifiers ici
 		
 	}
 

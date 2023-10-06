@@ -9,16 +9,32 @@ import lombok.ToString;
 @ToString
 public class SetBoosterSheetsDb implements IInsertableUpdatable {
 	
+	private String boosterName;
+	private String setCode;
+	private Boolean sheetHasBalanceColors;
+	private Boolean sheetIsFoil;
+	private String sheetName;
+	
 	@Override
 	public Object[] forUpdate() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Object[] {
+				boosterName,
+				sheetHasBalanceColors,
+				sheetIsFoil,
+				sheetName,			
+				setCode
+		};
 	}
 
 	@Override
 	public Object[] forInsert() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Object[] {
+				boosterName,
+				setCode,
+				sheetHasBalanceColors,
+				sheetIsFoil,
+				sheetName			
+		};
 	}
 
 }

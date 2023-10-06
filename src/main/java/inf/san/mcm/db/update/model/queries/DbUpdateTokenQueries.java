@@ -13,6 +13,17 @@ public final class DbUpdateTokenQueries {
 			as exist
 			""";
 	
+	public static final String EXISTS_TOKEN_BY_UUID = """
+			select 
+			    case 
+			        when exists (
+					    select 1 from tokenIdentifiers ti where uuid = ?
+					) then true
+					else false
+				end
+			as exist
+			""";
+	
 	public static final String SELECT_UUID = """
 			SELECT uuid
 			FROM tokens
@@ -177,6 +188,74 @@ public final class DbUpdateTokenQueries {
 				types = ?, 
 				watermark = ?
 			where uuid = ?
+			""";
+
+	public static final String SELECT_TOKEN_IDENTIFIERS = """
+			SELECT cardKingdomEtchedId, 
+				cardKingdomFoilId, 
+				cardKingdomId, 
+				cardsphereId, 
+				mcmId, 
+				mcmMetaId, 
+				mtgArenaId, 
+				mtgjsonFoilVersionId, 
+				mtgjsonNonFoilVersionId, 
+				mtgjsonV4Id, 
+				mtgoFoilId, 
+				mtgoId, 
+				multiverseId, 
+				scryfallId, 
+				scryfallIllustrationId, 
+				scryfallOracleId, 
+				tcgplayerEtchedProductId, 
+				tcgplayerProductId, 
+				uuid
+			FROM tokenIdentifiers
+			""";
+
+	public static final String UPDATE_TOKEN_IDENTIFIERS = """
+			UPDATE tokenIdentifiers
+			SET cardKingdomEtchedId = ?, 
+				cardKingdomFoilId = ?, 
+				cardKingdomId = ?, 
+				cardsphereId = ?, 
+				mcmId = ?, 
+				mcmMetaId = ?, 
+				mtgArenaId = ?, 
+				mtgjsonFoilVersionId = ?, 
+				mtgjsonNonFoilVersionId = ?, 
+				mtgjsonV4Id = ?, 
+				mtgoFoilId = ?, 
+				mtgoId = ?, 
+				multiverseId = ?, 
+				scryfallId = ?, 
+				scryfallIllustrationId = ?, 
+				scryfallOracleId = ?, 
+				tcgplayerEtchedProductId = ?, 
+				tcgplayerProductId = ?
+			WHERE uuid = ?
+			""";
+
+	public static final String INSERT_TOKEN_IDENTIFIERS = """
+			INSERT INTO tokenIdentifiers (cardKingdomEtchedId, 
+				cardKingdomFoilId, 
+				cardKingdomId, 
+				cardsphereId, 
+				mcmId, 
+				mcmMetaId, 
+				mtgArenaId, 
+				mtgjsonFoilVersionId, 
+				mtgjsonNonFoilVersionId, 
+				mtgjsonV4Id, 
+				mtgoFoilId, 
+				mtgoId, 
+				multiverseId, 
+				scryfallId, 
+				scryfallIllustrationId, 
+				scryfallOracleId, 
+				tcgplayerEtchedProductId, 
+				tcgplayerProductId, 
+			uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			""";
 	
 	private DbUpdateTokenQueries() {
