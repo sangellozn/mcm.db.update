@@ -24,5 +24,17 @@ public class DbSetBoosterContentsQueries {
 				sheetPicks
 			) VALUES (?, ?, ?, ?, ?)
 			""";
+	
+	public static final String INSERT_BASE = """
+			INSERT INTO setBoosterContents (
+				boosterIndex, 
+				boosterName, 
+				setCode, 
+				sheetName, 
+				sheetPicks
+			) VALUES
+			""";
+
+	public static final String VALUES_BASE = "(?, ?, ?, ?, ?)";
 
 }

@@ -15,6 +15,18 @@ public class DbSetBoosterSheetCardsQueries {
 			FROM setBoosterSheetCards
 			""";
 	
+	public static final String INSERT_BASE = """
+			INSERT INTO setBoosterSheetCards (
+				boosterName, 
+				cardUuid, 
+				cardWeight, 
+				setCode, 
+				sheetName
+			) VALUES
+			""";
+	
+	public static final String VALUES_BASE = "(?, ?, ?, ?, ?)";
+	
 	public static final String INSERT = """
 			INSERT INTO setBoosterSheetCards (
 				boosterName, 

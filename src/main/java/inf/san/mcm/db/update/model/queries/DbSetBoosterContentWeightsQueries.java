@@ -22,5 +22,16 @@ public class DbSetBoosterContentWeightsQueries {
 				setCode
 			) VALUES (?, ?, ?, ?)
 			""";
+	
+	public static final String INSERT_BASE = """
+			INSERT INTO setBoosterContentWeights (
+				boosterIndex, 
+				boosterName, 
+				boosterWeight, 
+				setCode
+			) VALUES
+			""";
+
+	public static final String VALUES_BASE = "(?, ?, ?, ?)";
 
 }

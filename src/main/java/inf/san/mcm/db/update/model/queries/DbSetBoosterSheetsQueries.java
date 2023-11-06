@@ -15,6 +15,16 @@ public class DbSetBoosterSheetsQueries {
 				FROM setBoosterSheets
 			""";
 	
+	public static final String INSERT_BASE = """
+			INSERT INTO setBoosterSheets (
+				boosterName, 
+				setCode, 
+				sheetHasBalanceColors, 
+				sheetIsFoil, 
+				sheetName
+			) VALUES
+			""";
+	
 	public static final String INSERT = """
 			INSERT INTO setBoosterSheets (
 				boosterName, 
@@ -24,5 +34,7 @@ public class DbSetBoosterSheetsQueries {
 				sheetName
 			) VALUES (?, ?, ?, ?, ?)
 			""";
+
+	public static final String VALUES_BASE = "(?, ?, ?, ?, ?)";
 
 }
