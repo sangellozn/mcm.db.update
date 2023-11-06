@@ -1,6 +1,6 @@
 package inf.san.mcm.db.update.model.queries;
 
-public final class DbUpdateSetsQueries {
+public final class DbSetsQueries {
 	
 	public static final String EXISTS_BY_CODE = """
 			select 
@@ -91,7 +91,7 @@ public final class DbUpdateSetsQueries {
 				WHERE code = ?
 			""";
 	
-	private DbUpdateSetsQueries() {
+	private DbSetsQueries() {
 		// Nothing.
 	}
 	

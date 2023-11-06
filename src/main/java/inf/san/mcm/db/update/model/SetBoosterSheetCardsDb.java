@@ -1,7 +1,5 @@
 package inf.san.mcm.db.update.model;
 
-import java.math.BigInteger;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,7 +11,7 @@ public class SetBoosterSheetCardsDb implements IInsertableUpdatable {
 	
 	private String boosterName;
 	private String cardUuid;
-	private BigInteger cardWeight;
+	private long cardWeight;
 	private String setCode;
 	private String sheetName;
 	

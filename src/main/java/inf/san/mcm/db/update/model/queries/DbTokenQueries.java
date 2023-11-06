@@ -1,6 +1,6 @@
 package inf.san.mcm.db.update.model.queries;
 
-public final class DbUpdateTokenQueries {
+public final class DbTokenQueries {
 
 	public static final String EXISTS_BY_UUID = """
 			select 
@@ -258,7 +258,7 @@ public final class DbUpdateTokenQueries {
 			uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			""";
 	
-	private DbUpdateTokenQueries() {
+	private DbTokenQueries() {
 		// Nothing.
 	}
 	
